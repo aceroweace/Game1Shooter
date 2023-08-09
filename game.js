@@ -7,7 +7,15 @@ const player = {
     width: 50,
     height: 30,
     speed: 5,
-    bullets: []
+    bullets: [],
+    leftMagnum: {
+        ammo: 6,
+        reloading: false
+    },
+    rightMagnum: {
+        ammo: 6,
+        reloading: false
+    }
 };
 
 const enemies = [];
@@ -15,6 +23,7 @@ const enemies = [];
 function drawPlayer() {
     ctx.fillStyle = 'blue';
     ctx.fillRect(player.x, player.y, player.width, player.height);
+    // Add code to visually represent the ammo count for each Magnum
 }
 
 function drawEnemies() {
@@ -75,15 +84,31 @@ document.addEventListener('keydown', function(event) {
     if (event.keyCode === 39 && player.x < canvas.width - player.width) { // Right arrow key
         player.x += player.speed;
     }
-    if (event.keyCode === 32) { // Space key
+    if (event.keyCode === 90 && player.leftMagnum.ammo > 0) { // Z key for left Magnum
+        player.leftMagnum.ammo--;
         const bullet = {
-            x: player.x + player.width / 2 - 5,
+            x: player.x,
             y: player.y,
             width: 10,
             height: 20,
             speed: 5
         };
         player.bullets.push(bullet);
+    }
+    if (event.keyCode === 88 && player.rightMagnum.ammo > 0) { // X key for right Magnum
+        player.rightMagnum.ammo--;
+        const bullet = {
+            x: player.x + player.width,
+            y: player.y,
+            width: 10,
+            height: 20,
+            speed: 5
+        };
+        player.bullets.push(bullet);
+    }
+    if (event.keyCode === 82) { // R key to reload both Magnums
+        player.leftMagnum.ammo = 6;
+        player.rightMagnum.ammo = 6;
     }
 });
 
