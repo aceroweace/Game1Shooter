@@ -6,15 +6,13 @@ const player = {
     y: canvas.height - 50,
     width: 50,
     height: 30,
-    speed: 5,
+    speed: 10, // Increased speed
     bullets: [],
     leftMagnum: {
-        ammo: 6,
-        reloading: false
+        ammo: 6
     },
     rightMagnum: {
-        ammo: 6,
-        reloading: false
+        ammo: 6
     }
 };
 
@@ -23,7 +21,6 @@ const enemies = [];
 function drawPlayer() {
     ctx.fillStyle = 'blue';
     ctx.fillRect(player.x, player.y, player.width, player.height);
-    // Add code to visually represent the ammo count for each Magnum
 }
 
 function drawEnemies() {
@@ -37,6 +34,8 @@ function updateEnemies() {
     for (let enemy of enemies) {
         enemy.y += enemy.speed;
     }
+    // Filter out enemies that are marked for removal
+    enemies = enemies.filter(enemy => !enemy.toRemove);
 }
 
 function drawBullets() {
@@ -50,7 +49,25 @@ function updateBullets() {
     for (let bullet of player.bullets) {
         bullet.y -= bullet.speed;
     }
-    player.bullets = player.bullets.filter(bullet => bullet.y > 0);
+    // Filter out bullets that are marked for removal
+    player.bullets = player.bullets.filter(bullet => !bullet.toRemove);
+}
+
+function checkCollisions() {
+    for (let bullet of player.bullets) {
+        for (let enemy of enemies) {
+            if (bullet.x < enemy.x + enemy.width &&
+                bullet.x + bullet.width > enemy.x &&
+                bullet.y < enemy.y + enemy.height &&
+                bullet.y + bullet.height > enemy.y) {
+                bullet.toRemove = true;
+                enemy.toRemove = true;
+                // Add explosion effect (for simplicity, just changing enemy color here)
+                ctx.fillStyle = 'yellow';
+                ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
+            }
+        }
+    }
 }
 
 function spawnEnemy() {
@@ -73,6 +90,8 @@ function gameLoop() {
 
     updateEnemies();
     updateBullets();
+
+    checkCollisions();
 
     requestAnimationFrame(gameLoop);
 }
